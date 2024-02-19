@@ -2,7 +2,7 @@ use super::*;
 use std::collections::HashMap;
 
 pub struct FungibleToken {
-	balances: HashMap<Address, Balance>,
+	balances: HashMap<u64, u64>,
 }
 
 impl FungibleToken {
@@ -14,8 +14,10 @@ impl FungibleToken {
 }
 
 impl Fungible for FungibleToken {
+	type Address = u64;
+	type Balance = u64;
 
-	fn transfer(&mut self, from: &Address, to: &Address, amount: Balance) -> Result<(), String> {
+	fn transfer(&mut self, from: &Self::Address, to: &Self::Address, amount: Self::Balance) -> Result<(), String> {
 		let from_balance = self.balance_of(&from);
 		if from_balance < amount {
 			return Err("Insufficient balance".to_string());
@@ -26,11 +28,11 @@ impl Fungible for FungibleToken {
 		Ok(())
 	}
 
-	fn balance_of(&self, owner: &Address) -> Balance {
+	fn balance_of(&self, owner: &Self::Address) -> Self::Balance {
 		*self.balances.get(owner).unwrap_or(&0)
 	}
 
-	fn set_balance(&mut self, owner: &Address, amount: Balance) {
+	fn set_balance(&mut self, owner: &Self::Address, amount: Self::Balance) {
 		self.balances.insert(*owner, amount);
 	}
 }
