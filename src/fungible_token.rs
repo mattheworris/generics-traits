@@ -1,38 +1,31 @@
 use super::*;
+use std::hash::Hash;
 use std::collections::HashMap;
+use std::ops::{Add, Sub};
 
-pub struct FungibleToken {
-	balances: HashMap<u64, u64>,
+pub struct FungibleToken<Address, Balance> {
+	pub balances: HashMap<Address, Balance>,
 }
 
-impl FungibleToken {
-	pub fn new() -> FungibleToken {
+impl<Address, Balance> FungibleToken<Address, Balance> {
+	pub fn new() -> FungibleToken<Address, Balance>{
 		FungibleToken {
 			balances: HashMap::new(),
 		}
 	}
 }
 
-impl Fungible for FungibleToken {
-	type Address = u64;
-	type Balance = u64;
-
-	fn set_balance(&mut self, owner: &Self::Address, amount: Self::Balance) {
+impl<Address, Balance> Fungible<Address, Balance> for FungibleToken<Address, Balance>
+where
+	Address: Eq + Hash + Copy,
+	Balance: Default + Copy + PartialOrd + Add<Output = Balance> + Sub<Output = Balance>,
+{
+	fn set_balance(&mut self, owner: &Address, amount: Balance) {
 		self.balances.insert(*owner, amount);
 	}
 
-	fn transfer(&mut self, from: &Self::Address, to: &Self::Address, amount: Self::Balance) -> Result<(), String> {
-		let from_balance = self.balance_of(&from);
-		if from_balance < amount {
-			return Err("Insufficient balance".to_string());
-		}
-		self.set_balance(from, from_balance - amount);
-		let to_balance = self.balance_of(&to);
-		self.set_balance(to, to_balance + amount);
-		Ok(())
-	}
-
-	fn balance_of(&self, owner: &Self::Address) -> Self::Balance {
-		*self.balances.get(owner).unwrap_or(&0)
+	fn balance_of(&self, owner: &Address) -> Balance {
+		let zero = Default::default();
+		*self.balances.get(owner).unwrap_or(&zero)
 	}
 }

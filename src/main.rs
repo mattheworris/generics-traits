@@ -1,28 +1,41 @@
 #![allow(unused_variables)]
 mod fungible_token;
 mod coin;
+use coin::Coin;
 use fungible_token::FungibleToken;
+use std::ops::{Add, Sub};
+use std::hash::Hash;
 
 /// Defines the behavior of a fungible token.
-pub trait Fungible {
-    /// Associated type Address represents an address in the system.
-    type Address;
-    /// Associated type Balance represents a balance of an Address.
-    type Balance;
-
+// Use type parameters to define the Generics Address and Balance.
+pub trait Fungible<Address, Balance>
+where Address: Eq + Hash + Copy,
+      Balance: Default + Copy + PartialOrd + Add<Output = Balance> + Sub<Output = Balance>,
+{
     /// Sets the balance of tokens for the specified address.
-    fn set_balance(&mut self, owner: &Self::Address, amount: Self::Balance);
+    /// Default implementation is not allowed to access data directly.
+    fn set_balance(&mut self, owner: &Address, amount: Balance);
 
     /// Transfers a specified amount of tokens from the caller's account to the specified address.
-    fn transfer(&mut self, from: &Self::Address, to: &Self::Address, amount: Self::Balance) -> Result<(), String>;
+    fn transfer(&mut self, from: &Address, to: &Address, amount: Balance) -> Result<(), String> {
+        // Default implementation
+        let from_balance = self.balance_of(&from);
+        if from_balance < amount {
+            return Err("Insufficient balance".to_string());
+        }
+        self.set_balance(from, from_balance - amount);
+        let to_balance = self.balance_of(&to);
+        self.set_balance(to, to_balance + amount);
+        Ok(())
+    }
 
     /// Retrieves the balance of tokens owned by the specified address.
-    fn balance_of(&self, owner: &Self::Address) -> Self::Balance;
+    fn balance_of(&self, owner: &Address) -> Balance;
 }   
 
 fn main() {
-    let mut token = FungibleToken::new();
-    let mut coin = coin::Coin::new();
+    let mut token = FungibleToken::<u64, u64>::new();
+    let mut coin = Coin::<u32, u32>::new();
     let staker: u64 =  1;
     let provider: u64 = 2;
 
