@@ -1,5 +1,6 @@
 #![allow(unused_variables)]
 mod fungible_token;
+mod coin;
 use fungible_token::FungibleToken;
 
 /// Defines the behavior of a fungible token.
@@ -21,17 +22,24 @@ pub trait Fungible {
 
 fn main() {
     let mut token = FungibleToken::new();
+    let mut coin = coin::Coin::new();
     let staker: u64 =  1;
     let provider: u64 = 2;
 
-    println!("Balance of address 1: {}", token.balance_of(&staker));
-    println!("Balance of address 2: {}", token.balance_of(&provider));
+    let coin_buyer: u32 = 1;
+    let coin_seller: u32 = 2;
 
     token.set_balance(&staker, 100);
     let result = token.transfer(&staker, &provider, 50);
 
-    println!("Balance of address 1: {}", token.balance_of(&staker));
-    println!("Balance of address 2: {}", token.balance_of(&provider));
+    println!("Balance of token address 1: {}", token.balance_of(&staker));
+    println!("Balance of token address 2: {}", token.balance_of(&provider));
+
+    coin.set_balance(&coin_buyer, 100);
+    let result = coin.transfer(&coin_buyer, &coin_seller, 50);
+
+    println!("Balance of coin address 1: {}", coin.balance_of(&coin_buyer));
+    println!("Balance of coin address 2: {}", coin.balance_of(&coin_seller));
 }
 
 #[cfg(test)]
@@ -41,8 +49,8 @@ mod tests {
     #[test]
     fn test_transfer_successful() {
         let mut token = FungibleToken::new();
-        let staker: Address = 1;
-        let provider: Address = 2;
+        let staker: u64 = 1;
+        let provider: u64 = 2;
 
         token.set_balance(&staker, 100);
         assert_eq!(token.balance_of(&staker), 100);
@@ -56,8 +64,8 @@ mod tests {
     #[test]
     fn test_transfer_insufficient_balance() {
         let mut token = FungibleToken::new();
-        let staker: Address = 1;
-        let provider: Address = 2;
+        let staker: u64 = 1;
+        let provider: u64 = 2;
 
         token.set_balance(&staker, 10);
         assert_eq!(token.balance_of(&staker), 10);

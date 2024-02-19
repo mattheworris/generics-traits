@@ -1,21 +1,21 @@
 use super::*;
 use std::collections::HashMap;
 
-pub struct FungibleToken {
-	balances: HashMap<u64, u64>,
+pub struct Coin {
+	balances: HashMap<u32, u32>,
 }
 
-impl FungibleToken {
-	pub fn new() -> FungibleToken {
-		FungibleToken {
+impl Coin {
+	pub fn new() -> Coin {
+		Coin {
 			balances: HashMap::new(),
 		}
 	}
-}
+}	
 
-impl Fungible for FungibleToken {
-	type Address = u64;
-	type Balance = u64;
+impl Fungible for Coin {
+	type Address = u32;
+	type Balance = u32;
 
 	fn set_balance(&mut self, owner: &Self::Address, amount: Self::Balance) {
 		self.balances.insert(*owner, amount);
