@@ -25,7 +25,6 @@ where
 	}
 
 	fn balance_of(&self, owner: &Address) -> Balance {
-		let zero = Default::default();
-		*self.balances.get(owner).unwrap_or(&zero)
+		*self.balances.get(owner).unwrap_or(&Default::default())
 	}
 }
