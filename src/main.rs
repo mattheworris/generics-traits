@@ -41,8 +41,8 @@ mod tests {
     #[test]
     fn test_transfer_successful() {
         let mut token = FungibleToken::new();
-        let staker: Address = 1;
-        let provider: Address = 2;
+        let staker: u64 = 1;
+        let provider: u64 = 2;
 
         token.set_balance(&staker, 100);
         assert_eq!(token.balance_of(&staker), 100);
@@ -56,8 +56,8 @@ mod tests {
     #[test]
     fn test_transfer_insufficient_balance() {
         let mut token = FungibleToken::new();
-        let staker: Address = 1;
-        let provider: Address = 2;
+        let staker: u64 = 1;
+        let provider: u64 = 2;
 
         token.set_balance(&staker, 10);
         assert_eq!(token.balance_of(&staker), 10);
